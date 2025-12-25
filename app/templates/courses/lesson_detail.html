@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ lesson.title }}</h2>
+
+<p><strong>Module:</strong> {{ module.title }}</p>
+<p><strong>Course:</strong> {{ course.title }}</p>
+
+<hr>
+
+<div style="white-space: pre-line;">
+    {{ lesson.content }}
+</div>
+
+<hr>
+
+<a class="btn btn-success"
+   href="{{ url_for('courses.complete_lesson',
+                    course_id=course.id,
+                    module_id=module.id,
+                    lesson_id=lesson.id) }}">
+  Mark as completed
+</a>
+
+<a class="btn btn-secondary ms-2"
+   href="{{ url_for('courses.module_detail',
+                    course_id=course.id,
+                    module_id=module.id) }}">
+  Back to module
+</a>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ module.title }} – {{ course.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ module.title }}</h2>
+
+{% if module_completed %}
+  <span class="badge bg-success mb-2">Module completed</span>
+{% endif %}
+
+
+<p><strong>Course:</strong> {{ course.title }}</p>
+
+<hr>
+
+<h3>Lessons</h3>
+
+<p>
+  <strong>Progress:</strong> {{ completed_lessons }} / {{ total_lessons }} lessons completed ({{ percent_done }}%)
+</p>
+
+<div class="progress mb-3" style="height: 20px;">
+  <div class="progress-bar" role="progressbar"
+       style="width: {{ percent_done }}%;"
+       aria-valuenow="{{ percent_done }}" aria-valuemin="0" aria-valuemax="100">
+    {{ percent_done }}%
+  </div>
+</div>
+
+
+{% if lessons %}
+  <ul class="list-group mb-3">
+    {% for lesson in lessons %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{{ url_for('courses.lesson_detail',
+                            course_id=course.id,
+                            module_id=module.id,
+                            lesson_id=lesson.id) }}">
+          {{ lesson.order }}. {{ lesson.title }}
+        </a>
+
+        {% set prog = (lesson.progress_records
+                       | selectattr("user_id", "equalto", current_user.id)
+                       | first) %}
+
+        {% if prog and prog.status == "completed" %}
+          <span class="badge bg-success">Completed</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No lessons yet.</p>
+{% endif %}
+
+<div class="mt-3 text-center">
+    {% if current_user.role == "instructor" and current_user.id == course.owner_id %}
+        <a class="btn btn-primary me-2"
+           href="{{ url_for('courses.add_lesson',
+                            course_id=course.id,
+                            module_id=module.id) }}">
+            + Add lesson
+        </a>
+    {% endif %}
+
+    <a class="btn btn-secondary"
+       href="{{ url_for('courses.course_detail', course_id=course.id) }}">
+      Back to course
+    </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home – MyLearn{% endblock %}
+{% block content %}
+  <h1>Welcome to MyLearn</h1>
+  <p>This is your MSc distributed online learning platform.</p>
+  {% if current_user.is_authenticated %}
+    <p><a class="btn btn-primary" href="{{ url_for('dashboard') }}">Go to dashboard</a></p>
+  {% else %}
+    <p>
+      <a class="btn btn-primary" href="{{ url_for('auth.login') }}">Login</a>
+      <a class="btn btn-secondary" href="{{ url_for('auth.register') }}">Register</a>
+    </p>
+  {% endif %}
+{% endblock %}

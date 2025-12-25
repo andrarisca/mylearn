@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Courses – MyLearn{% endblock %}
+{% block content %}
+<h2>All Courses</h2>
+
+{% if current_user.role == "instructor" %}
+  <p>
+    <a class="btn btn-primary" href="{{ url_for('courses.create_course') }}">
+      + Create new course
+    </a>
+  </p>
+{% endif %}
+
+{% if courses %}
+  <ul class="list-group">
+    {% for course in courses %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          <strong>{{ course.title }}</strong><br>
+          <small class="text-muted">{{ course.description or "No description" }}</small>
+        </span>
+        <a class="btn btn-sm btn-outline-secondary"
+           href="{{ url_for('courses.course_detail', course_id=course.id) }}">
+          View
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No courses yet.</p>
+{% endif %}
+{% endblock %}

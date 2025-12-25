@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Add Lesson – {{ module.title }}{% endblock %}
+
+{% block content %}
+<h2>Add Lesson to Module: {{ module.title }}</h2>
+
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Lesson Title</label>
+    <input class="form-control" type="text" name="title" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Order (optional)</label>
+    <input class="form-control" type="number" name="order" min="0">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Lesson Content</label>
+    <textarea class="form-control" name="content" rows="6"></textarea>
+  </div>
+
+  <button class="btn btn-primary">Add lesson</button>
+  <a class="btn btn-secondary"
+     href="{{ url_for('courses.module_detail', course_id=course.id, module_id=module.id) }}">
+     Cancel
+  </a>
+</form>
+
+{% endblock %}

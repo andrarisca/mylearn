@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – MyLearn{% endblock %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Welcome, {{ current_user.email }}!</p>
+
+<h3>Courses</h3>
+{% if courses %}
+  <ul>
+    {% for course in courses %}
+      <li>{{ course.title }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No courses yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Create Course – MyLearn{% endblock %}
+{% block content %}
+<h2>Create a new course</h2>
+
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input class="form-control" type="text" name="title" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea class="form-control" name="description" rows="4"></textarea>
+  </div>
+  <button class="btn btn-primary" type="submit">Create</button>
+  <a class="btn btn-secondary" href="{{ url_for('courses.list_courses') }}">Cancel</a>
+</form>
+{% endblock %}
