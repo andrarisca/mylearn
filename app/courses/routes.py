@@ -7,11 +7,10 @@ from . import courses_bp
 from app.models import Course, Module, Lesson, Enrollment, Progress 
 
 def user_can_access_course(course):
-    # Course owner (instructor) can always access
     if current_user.role == "instructor" and current_user.id == course.owner_id:
         return True
 
-    # Otherwise, only enrolled users can access
+    
     existing = Enrollment.query.filter_by(user_id=current_user.id, course_id=course.id).first()
     if existing:
         return True
@@ -30,7 +29,7 @@ def list_courses():
 @courses_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create_course():
-    # only instructors can create courses
+    
     if current_user.role != "instructor":
         flash("Only instructors can create courses.", "warning")
         return redirect(url_for("courses.list_courses"))
@@ -62,20 +61,16 @@ def create_course():
 def course_detail(course_id):
     course = Course.query.get_or_404(course_id)
 
-    # order modules by "order" then id
     modules = sorted(course.modules, key=lambda m: (m.order, m.id))
 
-    # check if current user is enrolled in this course
     is_enrolled = Enrollment.query.filter_by(
         user_id=current_user.id,
         course_id=course.id
     ).first() is not None
 
-    # --- COURSE PROGRESS (beginner-friendly, explicit) ---
     total_lessons = 0
     completed_lessons = 0
 
-    # only show progress if student is enrolled OR user is the instructor/owner
     can_see_progress = is_enrolled or (current_user.role == "instructor" and current_user.id == course.owner_id)
 
     if can_see_progress:
@@ -113,7 +108,6 @@ def course_detail(course_id):
 def enroll(course_id):
     course = Course.query.get_or_404(course_id)
 
-    # instructors don't need enrollment for their own course
     if current_user.role == "instructor" and current_user.id == course.owner_id:
         flash("You already own this course.", "info")
         return redirect(url_for("courses.course_detail", course_id=course.id))
@@ -162,7 +156,6 @@ def unenroll(course_id):
 def add_module(course_id):
     course = Course.query.get_or_404(course_id)
 
-    # only the instructor who owns the course can add modules
     if current_user.role != "instructor" or current_user.id != course.owner_id:
         flash("Only the course instructor can add modules.", "warning")
         return redirect(url_for("courses.course_detail", course_id=course.id))
@@ -199,19 +192,16 @@ def module_detail(course_id, module_id):
     course = Course.query.get_or_404(course_id)
     module = Module.query.get_or_404(module_id)
 
-    # make sure module belongs to course
     if module.course_id != course.id:
         flash("Invalid module.", "danger")
         return redirect(url_for("courses.course_detail", course_id=course.id))
 
-    # ACCESS CHECK
     if not user_can_access_course(course):
         flash("Please enroll to access the modules and lessons.", "warning")
         return redirect(url_for("courses.course_detail", course_id=course.id))
 
     lessons = sorted(module.lessons, key=lambda l: (l.order, l.id))
 
-    # progress counts for current user
     total_lessons = len(lessons)
 
     completed_lessons = 0
@@ -242,7 +232,6 @@ def add_lesson(course_id, module_id):
     module = Module.query.get_or_404(module_id)
     course = Course.query.get_or_404(course_id)
 
-    # Only instructor who owns the course can add lessons
     if current_user.role != "instructor" or course.owner_id != current_user.id:
         flash("Only the course instructor can add lessons.", "danger")
         return redirect(
@@ -292,12 +281,10 @@ def lesson_detail(course_id, module_id, lesson_id):
         flash("Invalid module.", "danger")
         return redirect(url_for("courses.course_detail", course_id=course.id))
 
-    # ACCESS CHECK
     if not user_can_access_course(course):
         flash("Please enroll to access lessons.", "warning")
         return redirect(url_for("courses.course_detail", course_id=course.id))
 
-    # get lesson safely (important!)
     lesson = Lesson.query.filter_by(id=lesson_id, module_id=module.id).first()
     if not lesson:
         flash("Invalid lesson.", "danger")
@@ -318,14 +305,12 @@ def complete_lesson(course_id, module_id, lesson_id):
 
     lesson = Lesson.query.get_or_404(lesson_id)
 
-    # ensure lesson belongs to module & course
     if lesson.module_id != module_id:
         flash("Invalid lesson.", "danger")
         return redirect(url_for("courses.module_detail",
                                 course_id=course_id,
                                 module_id=module_id))
 
-    # find existing progress record
     progress = Progress.query.filter_by(
         user_id=current_user.id,
         lesson_id=lesson_id

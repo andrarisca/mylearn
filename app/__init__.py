@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_required, current_user
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-login_manager.login_view = "auth.login"  # where to redirect if not logged in
+login_manager.login_view = "auth.login"  
 
 
 def create_app(config_class="config.DevConfig"):
@@ -17,13 +17,12 @@ def create_app(config_class="config.DevConfig"):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    from .models import User, Course  # make sure models are known
+    from .models import User, Course  
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # register the auth blueprint
     from .auth import auth_bp
     app.register_blueprint(auth_bp)
     
